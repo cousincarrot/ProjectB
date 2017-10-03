@@ -1,78 +1,93 @@
-//To Do: Point to the .txt doc wih the array vlues in it
-//set the values of that doc in an array
-//merge sort the values of that array
-//console.log the computed the number of inversions in the file given,
-//where the ith row of the file indicates the ith entry of an array
-/*
-function readTextFile("https://lagunita.stanford.edu/asset-v1:Engineering+Algorithms1+SelfPaced+type@asset+block/IntegerArray.txt") {
-    var rawFile = new XMLHttpRequest();
-    rawFile.open("GET", "IntegerArray.txt", false);
+//To Do: test a smaller array to make sure it is sorting
+
+var rawFile;
+var allText;
+var tally = 0;
+
+function readTextFile(file) {
+  console.log("inside readTextFile");
+
+    rawFile = new XMLHttpRequest();
+    rawFile.open("GET", file, true);
+    rawFile.send(null);
+  //  console.log(rawFile);
+    //console.log(rawFile.responseText);
     rawFile.onreadystatechange = function ()
     {
+      console.log("inside onreadystatechange");
+
         if(rawFile.readyState === 4)
         {
+          console.log("inside readystate === 4");
+
             if(rawFile.status === 200 || rawFile.status == 0)
             {
-                var allText = rawFile.responseText;
+              console.log("inside status === 200 || status === 0");
+                allText = rawFile.responseText;
                 alert(allText);
+                console.log(allText);
+                var tempArray = allText.split("\n");
+                console.log(tempArray[3]);
+                console.log(tempArray[120]);
+                console.log(tempArray[125]);
+                console.log(tempArray);
+                countInversions(tempArray);
+                console.log(tally);
+                //I need to test that merge sort is working with a much smaller array
+
             }
         }
     }
-    rawFile.send(null);
+  //  rawFile.send(null);
 }
-*/
+readTextFile("http://karensiebald.com/ProjectB/IntegerArray.txt");
 
-//creating a simple array to test mergesort functionality
-sortTest = new Array(6, 5, 4, 3, 2, 1);
-/*
-sortTest[0] = 20;
-sortTest[1] = 40;
-sortTest[2] = 30;
-sortTest[3] = 10;
-*/
-console.log(sortTest.length);
+//can I just call the rawFile variable an array??
+//console.log(allText);
+//var array = [allText];
+  //sourced from https://gist.github.com/rewonc/62b40c5f2f7f67ffa928
+function countInversions(array){
+  // Note: this uses a variant of merge sort
 
-//setting a tally for inversions
-var tally = 0;
-
-//mergesort
-// Split the array into halves and merge them recursively
-function mergeSort (sortTest) {
-  if (sortTest.length === 1) {
-    // return once we hit an array with a single item
-    return sortTest;
-  }
-
-  sortTest.middle = Math.floor(sortTest.length / 2) // get the middle item of the array rounded down
-  sortTest.left = sortTest.slice(0, sortTest.middle) // items on the left side
-  sortTest.right = sortTest.slice(sortTest.middle) // items on the right side
-
-  return merge(
-    mergeSort(sortTest.left),
-    mergeSort(sortTest.right)
-  )
-};
-
-// compare the arrays item by item and return the concatenated result
-function merge (left, right) {
-  let result = []
-  let indexLeft = 0
-  let indexRight = 0
-
-  while (indexLeft < left.length && indexRight < right.length) {
-    if (left[indexLeft] < right[indexRight]) {
-      result.push(left[indexLeft])
-      indexLeft++
-    } else {
-      result.push(right[indexRight])
-      indexRight++
-      tally++
+  //input handlers
+  if (array === undefined) {
+  console.log("Array must be defined to count inversions");
     }
+  if (array.length === 0 || array.length === 1) return 0;
+
+  tally = 0; // count for inversions
+  sort(array); // merge sort the array and increment tally when there are crossovers
+  return tally;
+
+
+
+  function sort(arr) {
+    if (arr.length === 1) return arr;
+    var right = arr.splice(Math.floor(arr.length/2), arr.length - 1);
+    return merge(sort(arr), sort(right));
   }
-
-  return result.concat(left.slice(indexLeft)).concat(right.slice(indexRight))
-};
-
-
-console.log(mergeSort(sortTest)); // [10, 20, 30, 40]
-console.log(tally);
+  function merge(left, right){
+    var merged = [];
+    var l = 0, r = 0;
+    var multiplier = 0;
+    while (l < left.length || r < right.length){
+      if (l === left.length){
+        merged.push(right[r]);
+        r++;
+      } else if (r === right.length){
+        merged.push(left[l]);
+        l++;
+        tally += multiplier;
+      } else if (left[l] < right[r]) {
+        merged.push(left[l]);
+        tally += multiplier;
+        l++;
+      } else {
+        merged.push(right[r]);
+        r++;
+        multiplier++;
+      }
+    }
+    return merged;
+  }
+}
